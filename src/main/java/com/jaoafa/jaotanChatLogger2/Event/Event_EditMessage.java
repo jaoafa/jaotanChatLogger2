@@ -9,6 +9,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import com.jaoafa.jaotanChatLogger2.Main;
 import com.jaoafa.jaotanChatLogger2.Lib.Library;
 import com.jaoafa.jaotanChatLogger2.Lib.MySQLDBManager;
@@ -71,10 +73,13 @@ public class Event_EditMessage {
 			attachments = null;
 		}
 
+		String hash = DigestUtils
+				.sha1Hex(message.getIdLong() + "_" + message.getTimeEdited().toEpochSecond() + "_edit"); // メッセージID + _ + 編集時刻 + _edit
+
 		try {
 			Connection conn = MySQLDBManager.getConnection();
 			PreparedStatement stmt = conn.prepareStatement(
-					"INSERT INTO `jaotanChatLogger2` (`msgid`, `displaytext`, `rawtext`, `guild_name`, `guild_id`, `channel_name`, `channel_id`, `author_name`, `author_nickname`, `author_id`, `author_discriminator`, `author_bot`, `author_webhook`, `msgtype`, `type`, `attachments`, `machine`, `timestamp`, `created_at`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);",
+					"INSERT INTO `jaotanChatLogger2` (`msgid`, `displaytext`, `rawtext`, `guild_name`, `guild_id`, `channel_name`, `channel_id`, `author_name`, `author_nickname`, `author_id`, `author_discriminator`, `author_bot`, `author_webhook`, `msgtype`, `type`, `attachments`, `machine`, `hash`, `timestamp`, `created_at`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);",
 					Statement.RETURN_GENERATED_KEYS);
 			stmt.setLong(1, message.getIdLong()); // msgid
 			stmt.setString(2, message.getContentDisplay()); // displaytext
@@ -93,7 +98,8 @@ public class Event_EditMessage {
 			stmt.setInt(15, 1); // type | 0 = new, 1 = edit, -1 = delete
 			stmt.setString(16, attachments); // attachments
 			stmt.setString(17, Library.getHostName()); // machine
-			stmt.setTimestamp(18, Timestamp.from(message.getTimeEdited().toInstant())); // timestamp
+			stmt.setString(18, hash); // hash
+			stmt.setTimestamp(19, Timestamp.from(message.getTimeCreated().toInstant())); // timestamp
 			stmt.executeUpdate();
 			ResultSet res = stmt.getGeneratedKeys();
 			if (res != null && res.next()) {
