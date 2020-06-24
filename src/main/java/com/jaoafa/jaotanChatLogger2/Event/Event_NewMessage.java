@@ -1,12 +1,15 @@
 package com.jaoafa.jaotanChatLogger2.Event;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -19,6 +22,7 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -41,10 +45,29 @@ public class Event_NewMessage {
 		}
 
 		String nickname = member != null ? member.getNickname() : null;
+		List<File> files = new ArrayList<>();
 		String attachments = String.join("\n",
 				message.getAttachments().stream().map(attachment -> attachment.getUrl()).collect(Collectors.toList()));
 		if (attachments.isEmpty()) {
 			attachments = null;
+		} else {
+			for (Attachment attachment : message.getAttachments()) {
+				File file = new File("files" + File.separator + channel.getId() + File.separator + message.getId(),
+						attachment.getFileName());
+				if (!file.getParentFile().mkdirs()) {
+					System.out.println("[" + Library.sdfFormat(new Date()) + "] create files directory failed.");
+					continue;
+				}
+				attachment
+						.downloadToFile(file)
+						.thenAccept(f -> System.out
+								.println("[" + Library.sdfFormat(new Date()) + "] Saved attachment to " + f.getName()))
+						.exceptionally(t -> {
+							t.printStackTrace();
+							return null;
+						});
+				files.add(file);
+			}
 		}
 
 		String hash = DigestUtils.sha1Hex(message.getIdLong() + "_new"); // メッセージID + _new
@@ -97,6 +120,9 @@ public class Event_NewMessage {
 							+ " | " + user.getAsTag()
 							+ " | SQLException | "
 							+ e.getMessage());
+			if (e.getMessage().startsWith("Duplicate entry")) {
+				files.stream().forEach(file -> file.delete());
+			}
 		}
 	}
 }
