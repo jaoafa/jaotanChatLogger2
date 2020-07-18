@@ -21,7 +21,6 @@ import com.jaoafa.jaotanChatLogger2.Event.Event_NewMessage;
 import com.jaoafa.jaotanChatLogger2.Event.Event_Ready;
 import com.jaoafa.jaotanChatLogger2.Lib.MySQLDBManager;
 
-import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
@@ -37,10 +36,9 @@ public class Main {
 		loadTargetGuilds();
 
 		try {
-			JDABuilder jdabuilder = new JDABuilder(AccountType.BOT)
+			JDABuilder jdabuilder = JDABuilder.createDefault(DiscordToken)
 					.setAutoReconnect(true)
 					.setBulkDeleteSplittingEnabled(false)
-					.setToken(DiscordToken)
 					.setContextEnabled(false)
 					.setEventManager(new AnnotatedEventManager());
 
