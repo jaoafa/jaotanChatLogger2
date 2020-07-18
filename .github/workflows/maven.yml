@@ -33,7 +33,6 @@ jobs:
       with:
         tag_name: ${{ steps.vars.outputs.SHORT_SHA }}
         release_name: Release ${{ steps.vars.outputs.SHORT_SHA }}
-        body: ${{ github.head_commit.url }}
         draft: false
         prerelease: false
     - name: Upload Release Asset
