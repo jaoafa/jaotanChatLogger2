@@ -54,6 +54,8 @@ public class Event_EditMessage {
 						"[" + Library.sdfFormat(new Date()) + "] EDIT   | " + guild.getName() + "#" + channel.getName()
 								+ " | " + user.getAsTag()
 								+ " | Error | rawtext equaled.");
+				res.close();
+				stmt.close();
 				return;
 			}
 			res.close();
