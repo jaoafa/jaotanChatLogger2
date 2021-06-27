@@ -92,7 +92,7 @@ public class Event_EditMessage {
 			stmt.setLong(7, channel.getIdLong()); // channel_id
 			stmt.setString(8, user.getName()); // author_name
 			stmt.setString(9, nickname); // author_nickname
-			stmt.setLong(10, channel.getIdLong()); // author_id
+			stmt.setLong(10, user.getIdLong()); // author_id
 			stmt.setInt(11, Integer.parseInt(user.getDiscriminator())); // author_discriminator
 			stmt.setBoolean(12, user.isBot()); // author_bot
 			stmt.setBoolean(13, message.isWebhookMessage()); // author_webhook
