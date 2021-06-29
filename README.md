@@ -4,7 +4,11 @@
 [![Support jdk](https://img.shields.io/badge/Support%20jdk-oraclejdk8-red.svg)](https://img.shields.io)
 [![License](https://img.shields.io/badge/license-jaoLicense-yellow.svg)](https://github.com/jaoafa/jao-Minecraft-Server/blob/master/jaoLICENSE.md)
 
-Discordで送受信されたメッセージをデータベースに蓄積し、ログとして残します。
+Discord で送受信されたメッセージをデータベースに蓄積し、ログとして残します。
+
+## 環境
+
+- Java 11
 
 ## ライセンス
 
